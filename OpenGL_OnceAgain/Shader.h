@@ -6,14 +6,27 @@
 #include <iostream>
 #include <sstream>
 class Shaders {
-
-public:
-
-	std::string shaderStringVERT,shaderStringFrag;
-
+private:
 	GLuint SHADERprogram;
 	GLuint vertexShader, fragmentShader;
+	std::string shaderStringVERT,shaderStringFrag;
+public:
 
+	//Getters
+	GLuint GetShaderProgram() const{
+		return SHADERprogram;
+	}
+	//helpers
+	
+	void setUNIFORMFloat(const std::string	&nameOFuniform, float value) {
+		GLuint uniLOC = glGetUniformLocation(SHADERprogram, nameOFuniform.c_str());
+		glUniform1f(uniLOC, value);
+	}
+
+	void setUNIFORMmat4(const std::string& nameOFuniform,const glm::mat4 &value) {
+		GLuint uniLOC = glGetUniformLocation(SHADERprogram, nameOFuniform.c_str());
+		glUniformMatrix4fv(uniLOC,1,GL_FALSE, glm::value_ptr(value));
+	}
 
 	void compilingShaders()
 	{
@@ -67,7 +80,8 @@ public:
 			return;
 		}
 
-		
+		glAttachShader(SHADERprogram, vertexShader);
+		glAttachShader(SHADERprogram, fragmentShader);
 
 		GLchar elog[1024] = { 0 };
 		GLint result = 0;
@@ -91,9 +105,6 @@ public:
 			printf("Error while validating shader program! : '%s'", elog);
 			return;
 		}
-
-		glAttachShader(SHADERprogram, vertexShader);
-		glAttachShader(SHADERprogram, fragmentShader);
 	}
 
 

@@ -10,7 +10,7 @@
 
 
 const GLint width = 800, Height = 600;
-GLuint VAO, VBO,EBO, shader,uniformModel,uniformProjection;
+GLuint VAO, VBO,EBO;
 
 bool dir = true;
 float triOffset = 0.0f;
@@ -19,119 +19,8 @@ float triIncreament = 0.005f;
 
 
 
-std::string testStringPath = "shader.vert";
-
-
-
-void flingingTest()
-{
-	
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-static const char* vShader = R"(		
-#version 330									
-											
-layout (location = 0) in vec3 pos;				
-												
-uniform mat4 model;			
-uniform mat4 projection;
-					
-out vec3 vCol;												
-void main()										
-{												
-	gl_Position = projection * model * vec4(pos.x,pos.y,pos.z,1.0f);	
-	vCol = (clamp(pos, 0.0,1.0));
-}
-)";
-
-
-static const char* fShader = R"(		
-#version 330									
-												
-out vec4 color;									
-in vec3 vCol;			
-void main()										
-{												
-	color =  vec4(vCol,1.0f);
-}												
-)";
-
-void addShader(GLuint theProgram, const char* shaderCode, GLenum shaderType)
-{
-	GLuint theShader = glCreateShader(shaderType);
-
-	const GLchar* theCode[1];
-	theCode[0] = shaderCode;
-
-	GLint codeLength[1];
-	codeLength[0] = strlen(shaderCode);
-	glShaderSource(theShader, 1, theCode, codeLength);
-	glCompileShader(theShader);
-
-	GLint result = 0;
-	GLchar elog[1024] = { 0 };
-	glGetShaderiv(theShader, GL_COMPILE_STATUS, &result);
-
-	if (!result) {
-		glGetShaderInfoLog(theShader, sizeof(elog), NULL, elog);
-		printf("error while compiling the %d shader :'%s'\n",shaderType, elog);
-		return;
-	}
-	glAttachShader(theProgram, theShader);
-}
-
-void compileShaders()
-{
-	shader = glCreateProgram();
-
-	if (!shader) {
-		printf("Failed to creathe the shader program!\n");
-		return;
-	}
-
-	addShader(shader, vShader, GL_VERTEX_SHADER);
-	addShader(shader, fShader, GL_FRAGMENT_SHADER);
-
-	GLint result = 0;
-	GLchar elog[1024] = { 0 };
-
-	//Linking the shader program and checking for linking
-	glLinkProgram(shader);
-	glGetProgramiv(shader, GL_LINK_STATUS, &result);
-	
-	if (!result) {
-		glGetProgramInfoLog(shader, sizeof(elog), NULL, elog);
-		printf("error while linking program :'%s'\n", elog);
-		return;
-	}
-	//Validating the shader program and checking for validating
-	glValidateProgram(shader);
-	glGetProgramiv(shader, GL_VALIDATE_STATUS, &result);
-	if (!result) {
-		glGetProgramInfoLog(shader, sizeof(elog), NULL, elog);
-		printf("error while validating program :'%s'\n", elog);
-		return;
-	}
-
-	uniformModel = glGetUniformLocation(shader, "model");
-	uniformProjection = glGetUniformLocation(shader, "projection");
-}
-
-
+std::string vertexShader = "shader.vert";
+std::string fragmentShader = "shader.frag";
 
 void createTriangle()
 {
@@ -226,16 +115,12 @@ int main()
 	GLfloat AnotheroneOffset = 1;
 
 	createTriangle();
-	compileShaders();
-	float angle = 0.0f;
 
 	GLfloat aspectRATIO = (GLfloat)800 / (GLfloat)600;
 	glm::mat4 projection = glm::perspective(glm::radians(60.0f), aspectRATIO, 0.1f, 100.0f);
 
-
-	flingingTest();
-
-
+	
+	Shaders shader(vertexShader, fragmentShader);
 
 	while (!glfwWindowShouldClose(mainWindow))
 	{
@@ -257,19 +142,16 @@ int main()
 		glClearColor(0.0f, 0.0f,0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(shader);
+		glUseProgram(shader.GetShaderProgram());
 		glBindVertexArray(VAO);
-		
+
+		//creating a model matrix that can do 3 different things - translation - rotation - scaling -
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, triOffset, -2.5f));
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
-		
 
-
-		
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		
+		//calling functions that set and create unifrom variables from our Shader.h folder which contains our Shaders class
+		shader.setUNIFORMmat4("projection", projection);
+		shader.setUNIFORMmat4("model", model);
 
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
