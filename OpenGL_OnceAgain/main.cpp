@@ -195,10 +195,11 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	//The while loop of the window(It keeps running untill your filthy ass clicks on the exit button)
+
 	GLfloat defaultOffset = 0;
 	GLfloat AnotheroneOffset = 1;
+
 	createTriangle();
-	//createTriangle(AnotheroneOffset);
 	compileShaders();
 	float angle = 0.0f;
 
@@ -207,7 +208,8 @@ int main()
 
 	while (!glfwWindowShouldClose(mainWindow))
 	{
-		//Handling user Input which in this case is me
+		//Handling user Input which in this case is nothing (yet).
+
 		glfwPollEvents();
 
 		if (dir) {
@@ -219,32 +221,29 @@ int main()
 		if (abs(triOffset )>=triMaxoffset) {
 			dir = !dir;
 		}
-		angle += 0.3f;
-		if (angle >= 360) angle -= 0.3f;
+
 		//clear the window
 		glClearColor(0.0f, 0.0f,0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(shader);
 		glBindVertexArray(VAO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, triOffset, -2.5f));
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
-		//glm::mat4 model2 = glm::mat4(1.0f);
-		//model2 = glm::rotate(model2, glm::radians(45.0f),glm::vec3(0.0f,1.0f,0.0f));
+		
 
 
-
-		//glUniform1f(uniformModel, triOffset);
+		
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		//glUniformMatrix4fv(uniformModel2, 1, GL_FALSE, glm::value_ptr(model2));
+		
 
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		
 		glUseProgram(0);
 		
 
