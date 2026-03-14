@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <GL/glew.h>
-#include <string.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <cmath>
+#include "Shader.h"
+
 
 const GLint width = 800, Height = 600;
 GLuint VAO, VBO,EBO, shader,uniformModel,uniformProjection;
@@ -15,6 +16,31 @@ bool dir = true;
 float triOffset = 0.0f;
 float triMaxoffset = 0.7f;
 float triIncreament = 0.005f;
+
+
+
+std::string testStringPath = "shader.vert";
+
+
+
+void flingingTest()
+{
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 static const char* vShader = R"(		
 #version 330									
@@ -205,6 +231,11 @@ int main()
 
 	GLfloat aspectRATIO = (GLfloat)800 / (GLfloat)600;
 	glm::mat4 projection = glm::perspective(glm::radians(60.0f), aspectRATIO, 0.1f, 100.0f);
+
+
+	flingingTest();
+
+
 
 	while (!glfwWindowShouldClose(mainWindow))
 	{
