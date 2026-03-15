@@ -10,13 +10,13 @@
 
 
 const GLint width = 800, Height = 600;
-GLuint VAO, VBO,EBO;
+GLuint VAO, VBO, EBO;
 
 bool dir = true;
 float triOffset = 0.0f;
 float triMaxoffset = 0.7f;
 float triIncreament = 0.005f;
-
+float angle = 0.0f;
 
 
 std::string vertexShader = "shader.vert";
@@ -117,7 +117,7 @@ int main()
 	createTriangle();
 
 	GLfloat aspectRATIO = (GLfloat)800 / (GLfloat)600;
-	glm::mat4 projection = glm::perspective(glm::radians(60.0f), aspectRATIO, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(70.0f), aspectRATIO, 0.1f, 100.0f);
 
 	
 	Shaders shader(vertexShader, fragmentShader);
@@ -137,6 +137,14 @@ int main()
 		if (abs(triOffset )>=triMaxoffset) {
 			dir = !dir;
 		}
+		if (angle >= 360)
+		{
+			angle = 0;
+		}
+		else
+		{
+			angle += 2.8f;
+		}
 
 		//clear the window
 		glClearColor(0.0f, 0.0f,0.0f, 1.0f);
@@ -147,9 +155,15 @@ int main()
 
 		//creating a model matrix that can do 3 different things - translation - rotation - scaling -
 		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, triOffset, -2.5f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+		
+		
 
 		//calling functions that set and create unifrom variables from our Shader.h folder which contains our Shaders class
+		shader.setUNIFORMFloat("time", glfwGetTime());
+
 		shader.setUNIFORMmat4("projection", projection);
 		shader.setUNIFORMmat4("model", model);
 
